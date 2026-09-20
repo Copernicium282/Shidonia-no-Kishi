@@ -122,6 +122,10 @@ sudo nixos-rebuild switch --flake .
 
 > **Note:** the interactive installer handles compositor integration on normal distributions. On NixOS / Home Manager you must integrate compositor configs yourself; sample configs live in the [`compositors/`](compositors/) directory.
 
+### Upstream sync
+
+New commits from upstream `ilyamiro/serpantinum` are merged automatically every Monday by the [`upstream-sync`](.github/workflows/upstream-sync.yml) workflow (or manually: GitHub → Actions → **Upstream sync** → Run workflow). The fork's stable overrides are preserved — conflicting paths resolve to this fork's version (see the `KEEP_OURS_PATTERNS` list in [`.github/scripts/upstream-sync.sh`](.github/scripts/upstream-sync.sh)), while all other upstream changes merge normally.
+
 ### Compositor integration
 
 Bundled sample configs for the supported window managers/compositors live in [`compositors/`](compositors/) (`hyprland`, `niri`, `sway`). On a fresh install the installer backs up your existing compositor directory and deploys the matching sample config for the compositor it detects.
