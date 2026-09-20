@@ -240,7 +240,11 @@ Variants {
                 return Math.round(Scaler.s(val));
             }
 
-            property int barHeight: s(40)
+            property int barThickness: {
+                let dummy = configRevision;
+                return (typeof Config !== "undefined" && Config.rawSettings && Config.rawSettings.bar && Config.rawSettings.bar.thickness !== undefined) ? Config.rawSettings.bar.thickness : 40;
+            }
+            property int barHeight: s(barThickness)
             property real cornerRadius: s(12)
 
             property real baseOffsetY: {

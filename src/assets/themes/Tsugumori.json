@@ -1,0 +1,28 @@
+{
+  "name": "Tsugumori",
+  "isColorFocused": true,
+  "colors": {
+    "base": "#0a0a0a",
+    "mantle": "#090b0f",
+    "crust": "#050608",
+    "text": "#e8e8e8",
+    "subtext0": "#92908d",
+    "subtext1": "#c3beb6",
+    "surface0": "#1a1814",
+    "surface1": "#26221f",
+    "surface2": "#373331",
+    "overlay0": "#4e4944",
+    "overlay1": "#555049",
+    "overlay2": "#646a72",
+    "blue": "#cc1515",
+    "sapphire": "#cf443c",
+    "peach": "#b36758",
+    "green": "#cc1515",
+    "red": "#cc1515",
+    "mauve": "#cc1515",
+    "pink": "#909090",
+    "yellow": "#a9a196",
+    "maroon": "#9e1010",
+    "teal": "#cc1515"
+  }
+}

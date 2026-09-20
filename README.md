@@ -1,165 +1,134 @@
-<div align="center">
-  <a href="https://ko-fi.com/ilyamiro">
-    <img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="ko-fi" />
-  </a>
-</div>
+# Shidonia no Kishi
 
-<div align="center">
-  <img src="docs/assets/banner.png" alt="Serpantinum" width="850" />
-</div>
+A Sidonia-themed fork of [serpantinum](https://github.com/ilyamiro/serpantinum), bundled with a set of matching SDDM and GRUB themes into a single repo with a single installer.
 
 ## Previews
 
 | | |
-|---|---|
-| ![Preview 1](docs/assets/previews/preview_1.png) | ![Preview 2](docs/assets/previews/preview_2.png) |
-| ![Preview 3](docs/assets/previews/preview_3.png) | ![Preview 4](docs/assets/previews/preview_4.png) |
+| --- | --- |
+| ![MainScreen](docs/assets/MainScreen.png) | ![MainScreen2](docs/assets/MainScreen2.png) |
+| ![SDDM](docs/assets/preview-sddm.png) | ![GRUB](docs/assets/preview-boot-grub.png) |
 
----
+## What's inside
+
+| Piece | Location | Notes |
+| --- | --- | --- |
+| Serpantinum shell (forked) | `src/` | Sidonia color theme `src/assets/themes/Tsugumori.json`, left bar with thickness support, scaled time/date/weather widgets |
+| SDDM theme | `config/sddm/themes/sidonia-no-kishi/` | "Sidonia night city" greeter, white + `#cc1515` red |
+| GRUB theme | `config/grub/themes/sidonia-no-kishi/` | Yorha-style boot menu, white text + red accents (installer sets `GRUB_THEME`, `GRUB_FONT`, `GRUB_GFXMODE` and reruns `grub-mkconfig`) |
+| Default settings | `config/serpantinum/settings.json` | Sidonia defaults: left bar, `Tsugumori` preset, thickness 48, overridden color palette |
+| Packages | `install/modules/deps.sh` | Bundled deps incl. `overskride-bin` (Bluetooth) and `adw-gtk-theme` |
+| Dark mode | `install/modules/darkmode.sh` | `prefer-dark` via gsettings + `adw-gtk3-dark` in GTK3/GTK4 settings |
+
+Telemetry is **disabled** in this fork (no install/usage data leaves your machine).
 
 ## Installation
 
-> [!IMPORTANT]
-> **Migrating from v1:** All previous configuration will be backed up and unused. Configuration of compositor settings such as monitors, keybinds, and autostart is now up to you, as the project migrated from being dotfiles to being a shell.
-
-### Arch Linux and its derivatives
-
-For Arch-based distributions (including systemd, OpenRC, and other init systems), run the automated installation script.:
+Run the installer locally:
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/ilyamiro/serpantinum/master/install/install.sh)"
-
+bash install/install.sh
 ```
 
-> [!NOTE]
-> To update, when or if you recieve a notification about the new version being available, just run the script again and choose "update"
+or directly from GitHub:
 
----
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/Copernicium282/Shidonia-no-Kishi/master/install/install.sh)"
+```
+
+The installer detects your compositor, installs dependencies (including `overskride-bin` and the dark-mode GTK theme), deploys the serpantinum shell, then:
+
+1. installs the SDDM theme to `/usr/share/sddm/themes/sidonia-no-kishi` and activates it,
+2. installs the GRUB theme to `/boot/grub/themes/sidonia-no-kishi`, rewrites `/etc/default/grub` (`GRUB_THEME`/`GRUB_FONT`/`GRUB_GFXMODE`), and regenerates `grub.cfg`,
+3. enables system-wide dark mode (`color-scheme: prefer-dark` + `adw-gtk3-dark` for GTK3/GTK4 apps such as Nautilus and overskride).
+
+Run `serpantinumd start` to launch the shell.
+
+> [!IMPORTANT]
+> **Migrating / updating:** the installer is stateful. Running it on a machine that already has a version installed enters the "update" flow — your configuration is backed up and preserved, and compositor files / existing configs are not overwritten on update.
+
+> [!NOTE]
+> To update, run the installer again and choose "update".
 
 ### NixOS
 
-Serpantinum provides flake outputs, a NixOS module for system dependencies, and a Home Manager module for user configuration and service management.
+The repo provides flake outputs: a NixOS module for system dependencies, a Home Manager module, and a runnable package.
 
-#### 1. Add Flake Input
-
-Add Serpantinum to your `flake.nix`:
+Add it to your `flake.nix`:
 
 ```nix
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    serpantinum.url = "github:ilyamiro/serpantinum";
+    shidonia.url = "github:Copernicium282/Shidonia-no-Kishi";
   };
 
-  outputs = { self, nixpkgs, serpantinum, ... }: {
+  outputs = { self, nixpkgs, shidonia, ... }: {
     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
-      specialArgs = { inherit serpantinum; };
+      specialArgs = { inherit shidonia; };
       modules = [
         ./configuration.nix
-        serpantinum.nixosModules.default
+        shidonia.nixosModules.default
       ];
     };
   };
 }
-
 ```
 
-#### 2. configuration.nix
-
-Enable the NixOS module to configure system prerequisites:
+Enable the system module:
 
 ```nix
 {
   programs.serpantinum.enable = true;
 }
-
 ```
 
-If you prefer installing the package directly without the system module:
+Or use the runnable package directly:
 
 ```nix
-{ pkgs, serpantinum, ... }:
-
+{ pkgs, shidonia, ... }:
 {
   environment.systemPackages = [
-    serpantinum.packages.${pkgs.stdenv.hostPlatform.system}.default
+    shidonia.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 }
-
 ```
 
-#### 3. Home Manager Configuration
+Home Manager:
 
 ```nix
-{ serpantinum, ... }:
-
+{ shidonia, ... }:
 {
-  imports = [
-    serpantinum.homeManagerModules.default
-  ];
+  imports = [ shidonia.homeManagerModules.default ];
 
   programs.serpantinum = {
     enable = true;
     systemd.enable = true;
-
     settings = {
-      wallpaperDir = "/home/username/Pictures/Wallpapers";
-
-      general = {
-        language = "en";
-        weatherUnit = "metric";
-        weatherInterval = 30;
-      };
-
-      bar = {
-        position = "top";
-        style = "solid";
-        width = 40;
-        workspaceCount = 10;
-        modules = {
-          left = [ "workspaces" ];
-          center = [ "time" ];
-          right = [ "tray" [ "kb" "wifi" "bt" "vol" "bat" ] ];
-        };
-      };
-
-      theme = {
-        fontFamily = "Adwaita Mono";
-        borderRadius = 12;
-        matugen = true;
-      };
-
-      notifications = {
-        dnd = false;
-        position = "top right";
-        sound = true;
-      };
+      theme = { fontSize = 13; fontFamily = "JetBrains Mono"; };
+      bar = { position = "left"; };
     };
   };
 }
-
 ```
 
-#### 4. Updating
-
-Update the flake lockfile and rebuild your system:
+Update the flake and rebuild:
 
 ```bash
-nix flake update serpantinum
+nix flake update shidonia
 sudo nixos-rebuild switch --flake .
-
 ```
 
-> **Note:** The automatic installer handles compositor integration on standard distributions. On NixOS / Home Manager, you must manually integrate compositor configs.
-> Sample configs, autostart entries, and keybindings for supported window managers and compositors are available in the [compositors](https://github.com/ilyamiro/serpantinum/tree/master/compositors) directory.
+> **Note:** the interactive installer handles compositor integration on normal distributions. On NixOS / Home Manager you must integrate compositor configs yourself; sample configs live in the [`compositors/`](compositors/) directory.
 
+### Compositor integration
 
-#### Required autostart
+Bundled sample configs for the supported window managers/compositors live in [`compositors/`](compositors/) (`hyprland`, `niri`, `sway`). On a fresh install the installer backs up your existing compositor directory and deploys the matching sample config for the compositor it detects.
 
-Remember to add clipboard listeners and required services to your compositor's autostart configuration for the clipboard and the equalizer to work properly.
+### Services & autostart
 
-Example on Hyprland:
+The installer enables the `easyeffects` user service plus the `NetworkManager` and `power-profiles-daemon` system services. Clipboard listeners for `cliphist` are not auto-added — add them to your compositor's autostart so clipboard history and the equalizer work. Example for Hyprland:
 
 ```lua
 hl.on("hyprland.start", function()
@@ -167,25 +136,16 @@ hl.on("hyprland.start", function()
   hl.exec_cmd("wl-paste --type image --watch cliphist store")
   hl.exec_cmd("systemctl --user enable --now easyeffects")
 end)
-
 ```
----
-
-## Running
-
-To run the shell, launch `serpantinumd start`
-
----
 
 ## Credits
 
-* Special thanks to Darkall44/Qylock for providing a gorgeous material SDDM theme!
-
----
+- [Serpantinum](https://github.com/ilyamiro/serpantinum) by [Illia Miroshnichenko](https://github.com/ilyamiro) — this repository is a fork of it.
+- [Sidonia](https://github.com/Aleph1-9012/Sidonia) — the Sidonia GRUB theme collection that inspired the aesthetic.
+- [Tsugumori](https://github.com/Aleph1-9012/Tsugumori) — the *Aleph* wallpaper set and palette.
+- [Qylock · pixel-night-city](https://github.com/Darkkal44/qylock) by [Darkkal44](https://github.com/Darkkal44) — base QML for the `sidonia-no-kishi` SDDM greeter.
+- [Yorha GRUB](https://github.com/OliveThePuffin/yorha-grub-theme) by [OliveThePuffin](https://github.com/OliveThePuffin) — base for the bundled GRUB theme (recolored with the Sidonia palette).
 
 ## License
 
-Copyright (C) 2026 Illia Miroshnichenko
-
-This project is licensed under the GNU Affero General Public License version 3, or (at your option) any later version. See the [LICENSE.md](LICENSE.md) file for the full license text.
-
+[GNU AGPL v3 or later](./LICENSE.md), inherited from serpantinum.

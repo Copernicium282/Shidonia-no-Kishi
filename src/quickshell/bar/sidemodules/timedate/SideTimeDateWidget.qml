@@ -70,10 +70,12 @@ Rectangle {
         onTriggered: typeInIndex += 1
     }
 
+    property real contentScale: barWindow ? (barWindow.barHeight / 40.0) : 1.0
+
     function s(val) {
-        if (barWindow && typeof barWindow.s === "function") return barWindow.s(val);
-        if (typeof Scaler !== "undefined" && typeof Scaler.s === "function") return Math.round(Scaler.s(val));
-        return val;
+        if (barWindow && typeof barWindow.s === "function") return barWindow.s(val * contentScale);
+        if (typeof Scaler !== "undefined" && typeof Scaler.s === "function") return Math.round(Scaler.s(val * contentScale));
+        return val * contentScale;
     }
 
     property int animDuration: 600

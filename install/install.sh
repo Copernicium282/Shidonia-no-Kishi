@@ -5,7 +5,7 @@ set -e
 setterm -blank 0 -powerdown 0 2>/dev/null || true
 printf '\033[9;0]' 2>/dev/null || true
 
-RAW_SLUG="${REPO_SLUG:-ilyamiro/serpantinum}"
+RAW_SLUG="${REPO_SLUG:-Copernicium282/Shidonia-no-Kishi}"
 REPO_SLUG="$(printf '%s' "$RAW_SLUG" | tr -d '\r\n\t ' | sed 's/[^a-zA-Z0-9_\/-]//g')"
 CACHE_BASE="${XDG_CACHE_HOME:-$HOME/.cache}/serpantinum-installer"
 export REPO_SLUG
@@ -47,6 +47,8 @@ source "$MODULES_DIR/version.sh"
 source "$MODULES_DIR/config.sh"
 source "$MODULES_DIR/service.sh"
 source "$MODULES_DIR/ui.sh"
+source "$MODULES_DIR/grub.sh"
+source "$MODULES_DIR/darkmode.sh"
 
 TELEMETRY_ID=$(get_telemetry_id)
 ENABLE_TELEMETRY=$(get_telemetry_enabled)
@@ -80,6 +82,8 @@ install_dependencies "$INSTALL_STATE" "$IS_REINSTALL" "${SELECTED_COMPOSITORS[@]
 
 deploy_package "$PROJECT_ROOT" "$OLD_COMMIT" "$TARGET_COMMIT" "$IS_REINSTALL" "$INSTALL_STATE" "${SELECTED_COMPOSITORS[@]}"
 setup_sddm "$PROJECT_ROOT" "$INSTALL_STATE" "$IS_REINSTALL"
+setup_grub "$PROJECT_ROOT"
+setup_darkmode
 install_wallpapers "$INSTALL_FULL_WALLPAPERS"
 
 WALLPAPER_DIR=$(get_wallpaper_dir)

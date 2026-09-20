@@ -163,16 +163,19 @@ setup_sddm() {
 
     sudo rm -rf /usr/share/sddm/themes/matugen-minimal
     sudo rm -rf /usr/share/sddm/themes/material-you
+    sudo rm -rf /usr/share/sddm/themes/sidonia-night-city
+    sudo rm -rf /usr/share/sddm/themes/sidonia-no-kishi
     sudo rm -f /etc/sddm.conf.d/*matugen*.conf
     sudo rm -f /etc/sddm.conf.d/*material-you*.conf
+    sudo rm -f /etc/sddm.conf.d/*sidonia*.conf
 
     if [ "$is_update" != true ] && [ -f /etc/sddm.conf ]; then
         sudo cp -a /etc/sddm.conf "/etc/sddm.conf.backup.$(date +%Y%m%d_%H%M%S)" 2>/dev/null || true
         sudo rm -f /etc/sddm.conf
     fi
 
-    local sddm_theme_src="$project_root/config/sddm/themes/material-you"
-    local sddm_theme_dest="/usr/share/sddm/themes/material-you"
+    local sddm_theme_src="$project_root/config/sddm/themes/sidonia-no-kishi"
+    local sddm_theme_dest="/usr/share/sddm/themes/sidonia-no-kishi"
 
     if [ -d "$sddm_theme_src" ]; then
         sudo mkdir -p "$sddm_theme_dest"
@@ -188,9 +191,9 @@ setup_sddm() {
     sudo mkdir -p /etc/sddm.conf.d
 
     if [ "$SDDM_WAYLAND" = true ]; then
-        cat <<EOF | sudo tee /etc/sddm.conf.d/10-material-you.conf > /dev/null
+        cat <<EOF | sudo tee /etc/sddm.conf.d/10-sidonia-no-kishi.conf > /dev/null
 [Theme]
-Current=material-you
+Current=sidonia-no-kishi
 ThemeDir=/usr/share/sddm/themes
 
 [General]
@@ -199,9 +202,9 @@ GreeterEnvironment=QT_WAYLAND_DISABLE_WINDOWDECORATION=1
 InputMethod=
 EOF
     else
-        cat <<EOF | sudo tee /etc/sddm.conf.d/10-material-you.conf > /dev/null
+        cat <<EOF | sudo tee /etc/sddm.conf.d/10-sidonia-no-kishi.conf > /dev/null
 [Theme]
-Current=material-you
+Current=sidonia-no-kishi
 ThemeDir=/usr/share/sddm/themes
 
 [General]

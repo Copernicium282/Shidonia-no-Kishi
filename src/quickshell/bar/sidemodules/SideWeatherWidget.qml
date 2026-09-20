@@ -29,6 +29,7 @@ Rectangle {
     property string weatherHex: Weather.currentHex
     property bool isWeatherLoading: Weather.isLoading || !Weather.isReady
 
+    property real contentScale: barWindow ? (barWindow.barHeight / 40.0) : 1.0
     property int animDuration: 600
     property real targetY: 0
     y: targetY
@@ -38,7 +39,7 @@ Rectangle {
         NumberAnimation { duration: sideWeatherWidgetRoot.animDuration; easing.type: Easing.OutQuint }
     }
 
-    property real verticalPadding: barWindow ? barWindow.s(isCompact ? 10 : 12) : (isCompact ? 10 : 12)
+    property real verticalPadding: barWindow ? barWindow.s((isCompact ? 10 : 12) * contentScale) : (isCompact ? 10 : 12)
     property real baseHeight: weatherCol.implicitHeight + (verticalPadding * 2)
     property real baseWidth: barWindow ? (isGrouped ? barWindow.barHeight - 8 : ((isSolid && distinctPills) ? barWindow.barHeight - 6 : barWindow.barHeight)) : (isGrouped ? 22 : ((isSolid && distinctPills) ? 24 : 30))
 
@@ -126,13 +127,13 @@ Rectangle {
         Column {
             id: weatherCol
             anchors.centerIn: parent
-            spacing: barWindow ? barWindow.s(sideWeatherWidgetRoot.isCompact ? 2 : 3) : (sideWeatherWidgetRoot.isCompact ? 2 : 3)
+            spacing: barWindow ? barWindow.s((sideWeatherWidgetRoot.isCompact ? 2 : 3) * sideWeatherWidgetRoot.contentScale) : (sideWeatherWidgetRoot.isCompact ? 2 : 3)
 
             LoaderIcon {
                 id: weatherLoader
                 anchors.horizontalCenter: parent.horizontalCenter
-                width: barWindow ? barWindow.s(sideWeatherWidgetRoot.isCompact ? 18 : 20) : (sideWeatherWidgetRoot.isCompact ? 18 : 20)
-                height: barWindow ? barWindow.s(sideWeatherWidgetRoot.isCompact ? 18 : 20) : (sideWeatherWidgetRoot.isCompact ? 18 : 20)
+                width: barWindow ? barWindow.s((sideWeatherWidgetRoot.isCompact ? 18 : 20) * sideWeatherWidgetRoot.contentScale) : (sideWeatherWidgetRoot.isCompact ? 18 : 20)
+                height: barWindow ? barWindow.s((sideWeatherWidgetRoot.isCompact ? 18 : 20) * sideWeatherWidgetRoot.contentScale) : (sideWeatherWidgetRoot.isCompact ? 18 : 20)
                 accentColor: ThemeBackend.mauve
                 running: sideWeatherWidgetRoot.isWeatherLoading
                 visible: sideWeatherWidgetRoot.isWeatherLoading
@@ -142,7 +143,7 @@ Rectangle {
                 text: weatherIcon
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.family: "Iosevka Nerd Font"
-                font.pixelSize: barWindow ? barWindow.s(sideWeatherWidgetRoot.isCompact ? 16 : 18) : (sideWeatherWidgetRoot.isCompact ? 16 : 18)
+                font.pixelSize: barWindow ? barWindow.s((sideWeatherWidgetRoot.isCompact ? 16 : 18) * sideWeatherWidgetRoot.contentScale) : (sideWeatherWidgetRoot.isCompact ? 16 : 18)
                 color: Qt.tint(weatherHex, Qt.rgba(ThemeBackend.mauve.r, ThemeBackend.mauve.g, ThemeBackend.mauve.b, sideWeatherWidgetRoot.isCompact ? 0.3 : 0.4))
                 visible: !sideWeatherWidgetRoot.isWeatherLoading && weatherIcon !== ""
             }
@@ -151,7 +152,7 @@ Rectangle {
                 text: weatherTemp
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.family: ThemeBackend.fontFamily
-                font.pixelSize: barWindow ? barWindow.s(sideWeatherWidgetRoot.isCompact ? 11 : 12) : (sideWeatherWidgetRoot.isCompact ? 11 : 12)
+                font.pixelSize: barWindow ? barWindow.s((sideWeatherWidgetRoot.isCompact ? 11 : 12) * sideWeatherWidgetRoot.contentScale) : (sideWeatherWidgetRoot.isCompact ? 11 : 12)
                 font.weight: Font.Black
                 color: sideWeatherWidgetRoot.isCompact ? Qt.lighter(ThemeBackend.peach, 1.1) : ThemeBackend.peach
                 visible: !sideWeatherWidgetRoot.isWeatherLoading
