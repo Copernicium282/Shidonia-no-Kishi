@@ -1,20 +1,25 @@
 #!/usr/bin/env bash
-# Weekly upstream sync for Shidonia-no-Kishi.
+# Upstream sync for Shidonia-no-Kishi, gated on version bumps.
 #
-# Merges the latest commits from ilyamiro/serpantinum into master while
-# preserving this fork's stable overrides:
-#   - any path matching KEEP_OURS_PATTERNS that conflicts is resolved
-#     to "ours" (the fork's version wins),
-#   - any other conflicting path is ALSO resolved to "ours" so the fork
-#     never breaks on a pull; upstream's non-conflicting changes still
-#     land via the regular three-way merge.
+# Runs on a schedule (matching the shell updater's hourly check cadence) and
+# merges new commits from ilyamiro/serpantinum into master whenever the fork's
+# version.txt is behind upstream's — i.e. on every upstream version change.
 #
-# Push is skipped when DRY_RUN is set (for local testing).
+# The fork's stable overrides are preserved:
+#   - any path that conflicts is resolved to "ours" (the fork's version wins),
+#     so the clean, upstream-facing files still receive upstream updates while
+#     the customized ones stay intact,
+#   - version.txt itself follows upstream (it's the "new release" signal that
+#     the installed shell uses to notify about an update).
+#
+# No merge happens without a version bump unless FORCE is set, or when
+# upstream has no new commits at all. Push is skipped when DRY_RUN is set.
 
 set -euo pipefail
 
 UPSTREAM_URL="${UPSTREAM_URL:-https://github.com/ilyamiro/serpantinum.git}"
 UPSTREAM_BRANCH="${UPSTREAM_BRANCH:-master}"
+FORCE="${FORCE:-}"
 DRY_RUN="${DRY_RUN:-}"
 
 # Paths this fork intentionally overrides. Informational: every conflict is
@@ -49,6 +54,41 @@ has_upstream_changes() {
     [ -n "$ancestor" ] && [ "$ancestor" != "$(git rev-parse "upstream/$UPSTREAM_BRANCH")" ]
 }
 
+# 0 if v1 < v2, 1 otherwise (dot-separated numeric parts).
+version_gt() {
+    local v1="$1" v2="$2"
+    local -a a b
+    IFS=. read -ra a <<< "$v1"
+    IFS=. read -ra b <<< "$v2"
+    local i x y
+    for i in "${!a[@]}"; do
+        x="${a[$i]:-0}"
+        y="${b[$i]:-0}"
+        if [ "$y" -gt "$x" ]; then return 0; fi
+        if [ "$x" -gt "$y" ]; then return 1; fi
+    done
+    return 1
+}
+
+version_gate_allows_merge() {
+    local head_ver up_ver
+    head_ver=$(git show "HEAD:version.txt" 2>/dev/null | tr -d '[:space:]')
+    up_ver=$(git show "upstream/$UPSTREAM_BRANCH:version.txt" 2>/dev/null | tr -d '[:space:]')
+    head_ver="${head_ver:-0.0.0}"
+    up_ver="${up_ver:-0.0.0}"
+    if version_gt "$head_ver" "$up_ver"; then
+        echo "upstream version $up_ver > fork version $head_ver, merging"
+        return 0
+    fi
+    echo "fork version $head_ver is not behind upstream $up_ver, skipping (use FORCE to override)"
+    return 1
+}
+
+ensure_identity() {
+    git config user.name >/dev/null 2>&1 || git config user.name "github-actions[bot]"
+    git config user.email >/dev/null 2>&1 || git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+}
+
 resolve_conflicts() {
     local conflicted
     conflicted=$(git diff --name-only --diff-filter=U)
@@ -75,11 +115,6 @@ resolve_conflicts() {
     git commit --no-edit --no-verify
 }
 
-ensure_identity() {
-    git config user.name >/dev/null 2>&1 || git config user.name "github-actions[bot]"
-    git config user.email >/dev/null 2>&1 || git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-}
-
 main() {
     ensure_identity
     git remote get-url upstream >/dev/null 2>&1 || git remote add upstream "$UPSTREAM_URL"
@@ -87,6 +122,10 @@ main() {
 
     if ! has_upstream_changes; then
         echo "no new upstream commits for $UPSTREAM_BRANCH, nothing to do"
+        exit 0
+    fi
+
+    if [ -z "$FORCE" ] && ! version_gate_allows_merge; then
         exit 0
     fi
 

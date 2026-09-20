@@ -2,8 +2,14 @@ name: Upstream sync
 
 on:
   schedule:
-    - cron: "0 12 * * 1"
+    - cron: "0 * * * *"
   workflow_dispatch:
+    inputs:
+      force:
+        description: "Merge upstream even without a version bump"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -24,6 +30,7 @@ jobs:
         run: bash .github/scripts/upstream-sync.sh
         env:
           UPSTREAM_URL: https://github.com/ilyamiro/serpantinum.git
+          FORCE: ${{ inputs.force }}
           GIT_AUTHOR_NAME: github-actions[bot]
           GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
           GIT_COMMITTER_NAME: github-actions[bot]

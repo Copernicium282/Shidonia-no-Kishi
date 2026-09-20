@@ -124,7 +124,7 @@ sudo nixos-rebuild switch --flake .
 
 ### Upstream sync
 
-New commits from upstream `ilyamiro/serpantinum` are merged automatically every Monday by the [`upstream-sync`](.github/workflows/upstream-sync.yml) workflow (or manually: GitHub → Actions → **Upstream sync** → Run workflow). The fork's stable overrides are preserved — conflicting paths resolve to this fork's version (see the `KEEP_OURS_PATTERNS` list in [`.github/scripts/upstream-sync.sh`](.github/scripts/upstream-sync.sh)), while all other upstream changes merge normally.
+The [`upstream-sync`](.github/workflows/upstream-sync.yml) workflow runs hourly and merges new commits from `ilyamiro/serpantinum` — but only when upstream bumps `version.txt`, so the fork picks up every release at the same cadence the installed shell checks for updates. It can also be triggered manually via GitHub → Actions → **Upstream sync** (optionally with **force** to merge even without a version bump). The fork's stable overrides are preserved — conflicting paths resolve to this fork's version (see `KEEP_OURS_PATTERNS` in [`.github/scripts/upstream-sync.sh`](.github/scripts/upstream-sync.sh)), while all other upstream changes merge normally and the new `version.txt` flows through so the shell notifies you about the update.
 
 ### Compositor integration
 
