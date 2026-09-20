@@ -5,7 +5,7 @@ import sys
 import time
 import urllib.request
 
-REPO = "Copernicium282/Shidonia-no-Kishi"
+REPO = "ilyamiro/serpantinum"
 DEFAULT_VER = "2.0.0"
 
 state_dir = os.path.expanduser("~/.local/state/serpantinum")
