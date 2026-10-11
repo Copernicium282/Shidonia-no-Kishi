@@ -6,8 +6,16 @@ fork**: the updater, version checks, and the Settings Update button all track
 the upstream original. This repo only carries the Shidonia customizations and
 re-applies them on top of the stock install.
 
-| ![MainScreen](docs/assets/MainScreen.png) | ![MainScreen2](docs/assets/MainScreen2.png) |
-| ![SDDM](docs/assets/preview-sddm.png) | ![GRUB](docs/assets/preview-boot-grub.png) |
+<table>
+  <tr>
+    <td width="50%"><img src="docs/assets/MainScreen.png" alt="MainScreen"/></td>
+    <td width="50%"><img src="docs/assets/MainScreen2.png" alt="MainScreen2"/></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/assets/preview-sddm.png" alt="SDDM"/></td>
+    <td width="50%"><img src="docs/assets/preview-boot-grub.png" alt="GRUB"/></td>
+  </tr>
+</table>
 
 ## Install (single file)
 
