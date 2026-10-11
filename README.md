@@ -11,7 +11,7 @@ re-applies them on top of the stock install.
 Pinned release (recommended):
 
 ```bash
-curl -fsSL https://github.com/Copernicium282/Shidonia-no-Kishi/releases/download/v1.0.0/shidonia-install.sh -o /tmp/shidonia-install.sh
+curl -fsSL https://github.com/Copernicium282/Shidonia-no-Kishi/releases/download/v1.0.1/shidonia-install.sh -o /tmp/shidonia-install.sh
 bash /tmp/shidonia-install.sh
 ```
 
