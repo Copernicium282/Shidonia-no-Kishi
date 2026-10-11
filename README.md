@@ -6,6 +6,9 @@ fork**: the updater, version checks, and the Settings Update button all track
 the upstream original. This repo only carries the Shidonia customizations and
 re-applies them on top of the stock install.
 
+| ![MainScreen](docs/assets/MainScreen.png) | ![MainScreen2](docs/assets/MainScreen2.png) |
+| ![SDDM](docs/assets/preview-sddm.png) | ![GRUB](docs/assets/preview-boot-grub.png) |
+
 ## Install (single file)
 
 Pinned release (recommended):
@@ -72,3 +75,11 @@ patch in `plugin/patches/` and re-run.
 
 Re-running `bash install.sh` (or `apply.sh --post-update`) at any time is
 safe and converges to the same state.
+
+## Credits
+
+- [Serpantinum](https://github.com/ilyamiro/serpantinum) by [Illia Miroshnichenko](https://github.com/ilyamiro) — the shell this plugin customizes.
+- [Sidonia](https://github.com/Aleph1-9012/Sidonia) — the Sidonia GRUB theme collection that inspired the aesthetic.
+- [Tsugumori](https://github.com/Aleph1-9012/Tsugumori) — the *Aleph* wallpaper set and palette.
+- [Qylock · pixel-night-city](https://github.com/Darkkal44/qylock) by [Darkkal44](https://github.com/Darkkal44) — base QML for the `sidonia-no-kishi` SDDM greeter.
+- [Yorha GRUB](https://github.com/OliveThePuffin/yorha-grub-theme) by [OliveThePuffin](https://github.com/OliveThePuffin) — base for the bundled GRUB theme (recolored with the Sidonia palette).
