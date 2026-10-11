@@ -38,9 +38,11 @@ def main():
     # NOTE: chain_target must stay unquoted here. This replacement lands
     # inside the single-quoted `bash -c '...'` body of the Update command,
     # so any double quote we emit is literal to the outer shell and would
-    # unbalance it (that broke the Update button once already).
+    # unbalance it (that broke the Update button once already). `trap "" HUP`
+    # keeps the hook alive if the terminal is closed mid-apply; file-level
+    # convergence then still completes (sudo steps need the open terminal).
     old = 'install.sh)\\"\''
-    new = 'install.sh)\\"; bash ' + chain_target + ' --post-update\''
+    new = 'install.sh)\\"; trap \\"\\" HUP; bash ' + chain_target + ' --post-update\''
     count = text.count(old)
     if count != 2:
         print(
