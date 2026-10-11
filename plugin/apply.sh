@@ -87,6 +87,7 @@ PATCHES=(
     "bar-thickness.patch"
     "side-weather-scale.patch"
     "side-timedate-scale.patch"
+    "side-bat-square.patch"
 )
 for p in "${PATCHES[@]}"; do
     [ -f "$PATCHES_DIR/$p" ] || { echo -e "\e[33m[ SKIP ]\e[0m $p not shipped"; continue; }
