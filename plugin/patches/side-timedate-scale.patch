@@ -1,0 +1,18 @@
+--- a/src/quickshell/bar/faces/timedate/SideTimeDateFace.qml
++++ b/src/quickshell/bar/faces/timedate/SideTimeDateFace.qml
+@@ -75,10 +75,12 @@
+         onTriggered: typeInIndex += 1
+     }
+ 
++    property real contentScale: barWindow ? (barWindow.barHeight / 40.0) : 1.0
++
+     function s(val) {
+-        if (barWindow && typeof barWindow.s === "function") return barWindow.s(val);
+-        if (typeof Scaler !== "undefined" && typeof Scaler.s === "function") return Math.round(Scaler.s(val));
+-        return val;
++        if (barWindow && typeof barWindow.s === "function") return barWindow.s(val * contentScale);
++        if (typeof Scaler !== "undefined" && typeof Scaler.s === "function") return Math.round(Scaler.s(val * contentScale));
++        return val * contentScale;
+     }
+ 
+     property real verticalPadding: s(isCompact ? 10 : 12)

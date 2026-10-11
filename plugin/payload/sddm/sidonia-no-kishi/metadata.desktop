@@ -1,0 +1,8 @@
+[SddmGreeterTheme]
+Name=sidonia-night-city
+Description=Sidonia Night City SDDM Greeter
+Author=Darkkal44 (converted for Sidonia)
+Type=sddm-theme
+MainScript=Main.qml
+ConfigFile=theme.conf
+QtVersion=6
