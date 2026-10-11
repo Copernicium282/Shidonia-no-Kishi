@@ -1,0 +1,48 @@
+--- a/src/quickshell/bar/faces/weather/SideWeatherFace.qml
++++ b/src/quickshell/bar/faces/weather/SideWeatherFace.qml
+@@ -27,7 +27,9 @@
+     property string weatherHex: Weather.currentHex
+     property bool isWeatherLoading: Weather.isLoading || !Weather.isReady
+ 
+-    property real verticalPadding: barWindow ? barWindow.s(isCompact ? 10 : 12) : (isCompact ? 10 : 12)
++    property real contentScale: barWindow ? (barWindow.barHeight / 40.0) : 1.0
++
++    property real verticalPadding: barWindow ? barWindow.s((isCompact ? 10 : 12) * contentScale) : (isCompact ? 10 : 12)
+     property real targetHeight: weatherCol.implicitHeight + (verticalPadding * 2)
+ 
+     implicitHeight: targetHeight
+@@ -52,13 +54,13 @@
+         Column {
+             id: weatherCol
+             anchors.centerIn: parent
+-            spacing: barWindow ? barWindow.s(root.isCompact ? 2 : 3) : (root.isCompact ? 2 : 3)
++            spacing: barWindow ? barWindow.s((root.isCompact ? 2 : 3) * root.contentScale) : (root.isCompact ? 2 : 3)
+ 
+             LoaderIcon {
+                 id: weatherLoader
+                 anchors.horizontalCenter: parent.horizontalCenter
+-                width: barWindow ? barWindow.s(root.isCompact ? 18 : 20) : (root.isCompact ? 18 : 20)
+-                height: barWindow ? barWindow.s(root.isCompact ? 18 : 20) : (root.isCompact ? 18 : 20)
++                width: barWindow ? barWindow.s((root.isCompact ? 18 : 20) * root.contentScale) : (root.isCompact ? 18 : 20)
++                height: barWindow ? barWindow.s((root.isCompact ? 18 : 20) * root.contentScale) : (root.isCompact ? 18 : 20)
+                 accentColor: ThemeBackend.mauve
+                 running: root.isWeatherLoading
+                 visible: root.isWeatherLoading
+@@ -68,7 +70,7 @@
+                 text: root.weatherIcon
+                 anchors.horizontalCenter: parent.horizontalCenter
+                 font.family: "Iosevka Nerd Font"
+-                font.pixelSize: barWindow ? barWindow.s(root.isCompact ? 16 : 18) : (root.isCompact ? 16 : 18)
++                font.pixelSize: barWindow ? barWindow.s((root.isCompact ? 16 : 18) * root.contentScale) : (root.isCompact ? 16 : 18)
+                 color: Qt.tint(root.weatherHex, Qt.rgba(ThemeBackend.mauve.r, ThemeBackend.mauve.g, ThemeBackend.mauve.b, root.isCompact ? 0.3 : 0.4))
+                 visible: !root.isWeatherLoading && root.weatherIcon !== ""
+             }
+@@ -77,7 +79,7 @@
+                 text: root.weatherTemp
+                 anchors.horizontalCenter: parent.horizontalCenter
+                 font.family: ThemeBackend.fontFamily
+-                font.pixelSize: barWindow ? barWindow.s(root.isCompact ? 11 : 12) : (root.isCompact ? 11 : 12)
++                font.pixelSize: barWindow ? barWindow.s((root.isCompact ? 11 : 12) * root.contentScale) : (root.isCompact ? 11 : 12)
+                 font.weight: Font.Black
+                 color: root.isCompact ? Qt.lighter(ThemeBackend.peach, 1.1) : ThemeBackend.peach
+                 visible: !root.isWeatherLoading

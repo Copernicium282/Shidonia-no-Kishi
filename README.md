@@ -1,161 +1,74 @@
-# Shidonia no Kishi
+# Shidonia-no-Kishi (Serpantinum plugin)
 
-A Sidonia-themed fork of [serpantinum](https://github.com/ilyamiro/serpantinum), bundled with a set of matching SDDM and GRUB themes into a single repo with a single installer.
+Sidonia-themed customization pack for the stock
+[Serpantinum](https://github.com/ilyamiro/serpantinum) shell. This is **not a
+fork**: the updater, version checks, and the Settings Update button all track
+the upstream original. This repo only carries the Shidonia customizations and
+re-applies them on top of the stock install.
 
-## Previews
+## Install (single file)
 
-| | |
-| --- | --- |
-| ![MainScreen](docs/assets/MainScreen.png) | ![MainScreen2](docs/assets/MainScreen2.png) |
-| ![SDDM](docs/assets/preview-sddm.png) | ![GRUB](docs/assets/preview-boot-grub.png) |
-
-## What's inside
-
-| Piece | Location | Notes |
-| --- | --- | --- |
-| Serpantinum shell (forked) | `src/` | Sidonia color theme `src/assets/themes/Tsugumori.json`, left bar with thickness support, scaled time/date/weather widgets |
-| SDDM theme | `config/sddm/themes/sidonia-no-kishi/` | "Sidonia night city" greeter, white + `#cc1515` red |
-| GRUB theme | `config/grub/themes/sidonia-no-kishi/` | Yorha-style boot menu, white text + red accents (installer sets `GRUB_THEME`, `GRUB_FONT`, `GRUB_GFXMODE` and reruns `grub-mkconfig`) |
-| Default settings | `config/serpantinum/settings.json` | Sidonia defaults: left bar, `Tsugumori` preset, thickness 48, overridden color palette |
-| Packages | `install/modules/deps.sh` | Bundled deps incl. `overskride-bin` (Bluetooth) and `adw-gtk-theme` |
-| Dark mode | `install/modules/darkmode.sh` | `prefer-dark` via gsettings + `adw-gtk3-dark` in GTK3/GTK4 settings |
-
-Telemetry is **disabled** in this fork (no install/usage data leaves your machine).
-
-## Installation
-
-Run the installer locally:
+Pinned release (recommended):
 
 ```bash
-bash install/install.sh
+curl -fsSL https://github.com/Copernicium282/Shidonia-no-Kishi/releases/download/v1.0.0/shidonia-install.sh -o /tmp/shidonia-install.sh
+bash /tmp/shidonia-install.sh
 ```
 
-or directly from GitHub:
+From a checkout:
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/Copernicium282/Shidonia-no-Kishi/master/install/install.sh)"
+bash install.sh
 ```
 
-The installer detects your compositor, installs dependencies (including `overskride-bin` and the dark-mode GTK theme), deploys the serpantinum shell, then:
-
-1. installs the SDDM theme to `/usr/share/sddm/themes/sidonia-no-kishi` and activates it,
-2. installs the GRUB theme to `/boot/grub/themes/sidonia-no-kishi`, rewrites `/etc/default/grub` (`GRUB_THEME`/`GRUB_FONT`/`GRUB_GFXMODE`), and regenerates `grub.cfg`,
-3. enables system-wide dark mode (`color-scheme: prefer-dark` + `adw-gtk3-dark` for GTK3/GTK4 apps such as Nautilus and overskride).
-
-Run `serpantinumd start` to launch the shell.
-
-> [!IMPORTANT]
-> **Migrating / updating:** the installer is stateful. Running it on a machine that already has a version installed enters the "update" flow — your configuration is backed up and preserved, and compositor files / existing configs are not overwritten on update.
-
-> [!NOTE]
-> To update, run the installer again and choose "update".
-
-### NixOS
-
-The repo provides flake outputs: a NixOS module for system dependencies, a Home Manager module, and a runnable package.
-
-Add it to your `flake.nix`:
-
-```nix
-{
-  inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    shidonia.url = "github:Copernicium282/Shidonia-no-Kishi";
-  };
-
-  outputs = { self, nixpkgs, shidonia, ... }: {
-    nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      specialArgs = { inherit shidonia; };
-      modules = [
-        ./configuration.nix
-        shidonia.nixosModules.default
-      ];
-    };
-  };
-}
-```
-
-Enable the system module:
-
-```nix
-{
-  programs.serpantinum.enable = true;
-}
-```
-
-Or use the runnable package directly:
-
-```nix
-{ pkgs, shidonia, ... }:
-{
-  environment.systemPackages = [
-    shidonia.packages.${pkgs.stdenv.hostPlatform.system}.default
-  ];
-}
-```
-
-Home Manager:
-
-```nix
-{ shidonia, ... }:
-{
-  imports = [ shidonia.homeManagerModules.default ];
-
-  programs.serpantinum = {
-    enable = true;
-    systemd.enable = true;
-    settings = {
-      theme = { fontSize = 13; fontFamily = "JetBrains Mono"; };
-      bar = { position = "left"; };
-    };
-  };
-}
-```
-
-Update the flake and rebuild:
+No clone needed:
 
 ```bash
-nix flake update shidonia
-sudo nixos-rebuild switch --flake .
+bash -c 'eval "$(curl -fsSL https://raw.githubusercontent.com/Copernicium282/Shidonia-no-Kishi/master/install.sh)"'
 ```
 
-> **Note:** the interactive installer handles compositor integration on normal distributions. On NixOS / Home Manager you must integrate compositor configs yourself; sample configs live in the [`compositors/`](compositors/) directory.
-
-### Upstream sync
-
-The shell's built-in updater checks `ilyamiro/serpantinum/version.txt` at its normal interval, exactly like upstream. To adopt a new upstream release while keeping this fork's overrides, run the bundled script locally:
+Requirements: a stock `ilyamiro/serpantinum` install. Coming from the old
+Shidonia fork build? Run the upstream installer once first, then this:
 
 ```bash
-./sync-upstream.sh        # merges upstream with keep-ours; add FORCE=1 to merge without a version bump
+bash -c 'eval "$(curl -fsSL https://raw.githubusercontent.com/ilyamiro/serpantinum/master/install/install.sh)"'
+bash install.sh
 ```
 
-It fetches the newest upstream commits, merges them so conflicting paths resolve to this fork's version (see `KEEP_OURS_PATTERNS` inside the script) and the new `version.txt` flows through, then pushes to `origin`. Run `DRY_RUN=1 ./sync-upstream.sh` to inspect the merge before pushing.
+## What it customizes
 
-### Compositor integration
+- **Shell theme**: Tsugumori preset + Sidonia palette, JetBrains Mono,
+  left bar at 48px (`bar.thickness`), bar content scaled to match.
+- **Shell code** (re-applied as patches, so upstream refactors fail loudly
+  instead of silently reverting): bar thickness support, side weather /
+  timedate scaling.
+- **Login + boot**: `sidonia-no-kishi` SDDM theme (set as current) and GRUB
+  theme, system-wide dark mode, telemetry off, extra packages
+  (`gsettings-desktop-schemas`, `overskride-bin` when an AUR helper exists).
 
-Bundled sample configs for the supported window managers/compositors live in [`compositors/`](compositors/) (`hyprland`, `niri`, `sway`). On a fresh install the installer backs up your existing compositor directory and deploys the matching sample config for the compositor it detects.
+## How updates survive
 
-### Services & autostart
+`install.sh` stages the plugin persistently at
+`~/.local/share/shidonia-plugin` (the upstream installer never touches that
+path) and `plugin/apply.sh` patches the installed Settings About page so the
+**Update** button runs:
 
-The installer enables the `easyeffects` user service plus the `NetworkManager` and `power-profiles-daemon` system services. Clipboard listeners for `cliphist` are not auto-added — add them to your compositor's autostart so clipboard history and the equalizer work. Example for Hyprland:
-
-```lua
-hl.on("hyprland.start", function()
-  hl.exec_cmd("wl-paste --type text --watch cliphist store")
-  hl.exec_cmd("wl-paste --type image --watch cliphist store")
-  hl.exec_cmd("systemctl --user enable --now easyeffects")
-end)
+```
+upstream install.sh  →  plugin apply.sh --post-update
 ```
 
-## Credits
+So a Settings-driven update installs stock upstream first, then the plugin
+re-overlays everything in the same terminal (sudo can still prompt):
 
-- [Serpantinum](https://github.com/ilyamiro/serpantinum) by [Illia Miroshnichenko](https://github.com/ilyamiro) — this repository is a fork of it.
-- [Sidonia](https://github.com/Aleph1-9012/Sidonia) — the Sidonia GRUB theme collection that inspired the aesthetic.
-- [Tsugumori](https://github.com/Aleph1-9012/Tsugumori) — the *Aleph* wallpaper set and palette.
-- [Qylock · pixel-night-city](https://github.com/Darkkal44/qylock) by [Darkkal44](https://github.com/Darkkal44) — base QML for the `sidonia-no-kishi` SDDM greeter.
-- [Yorha GRUB](https://github.com/OliveThePuffin/yorha-grub-theme) by [OliveThePuffin](https://github.com/OliveThePuffin) — base for the bundled GRUB theme (recolored with the Sidonia palette).
+- Files already intact are left alone; files the update wiped are restored.
+- User settings are merged with snapshot semantics: keys you never touched
+  follow the plugin defaults, keys you edited yourself are never overwritten.
+- The SDDM login theme is re-asserted (stock updates reset it to
+  `material-you`); GRUB/darkmode/config persist on their own.
 
-## License
+If a patch ever stops applying (upstream refactored those files), apply
+aborts that patch with an error and everything else still runs — update the
+patch in `plugin/patches/` and re-run.
 
-[GNU AGPL v3 or later](./LICENSE.md), inherited from serpantinum.
+Re-running `bash install.sh` (or `apply.sh --post-update`) at any time is
+safe and converges to the same state.
