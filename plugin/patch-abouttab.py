@@ -35,8 +35,12 @@ def main():
         chain_target = "$HOME/.local/share/shidonia-plugin/plugin/apply.sh"
     else:
         chain_target = apply_path
+    # NOTE: chain_target must stay unquoted here. This replacement lands
+    # inside the single-quoted `bash -c '...'` body of the Update command,
+    # so any double quote we emit is literal to the outer shell and would
+    # unbalance it (that broke the Update button once already).
     old = 'install.sh)\\"\''
-    new = 'install.sh)\\"; bash \\"' + chain_target + '\\" --post-update\\"\''
+    new = 'install.sh)\\"; bash ' + chain_target + ' --post-update\''
     count = text.count(old)
     if count != 2:
         print(
