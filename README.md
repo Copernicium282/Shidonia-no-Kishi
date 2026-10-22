@@ -22,7 +22,7 @@ re-applies them on top of the stock install.
 Pinned release (recommended):
 
 ```bash
-curl -fsSL https://github.com/Copernicium282/Shidonia-no-Kishi/releases/download/v1.0.1/shidonia-install.sh -o /tmp/shidonia-install.sh
+curl -fsSL https://github.com/Copernicium282/Shidonia-no-Kishi/releases/download/v1.0.2/shidonia-install.sh -o /tmp/shidonia-install.sh
 bash /tmp/shidonia-install.sh
 ```
 
@@ -46,16 +46,26 @@ bash -c 'eval "$(curl -fsSL https://raw.githubusercontent.com/ilyamiro/serpantin
 bash install.sh
 ```
 
+GRUB is themed only when it is detected. On Limine, systemd-boot, or another
+bootloader, install with `--no-grub`; the choice is stored and reused by every
+future update:
+
+```bash
+bash /tmp/shidonia-install.sh --no-grub
+```
+
 ## What it customizes
 
 - **Shell theme**: Tsugumori preset + Sidonia palette, JetBrains Mono,
-  left bar at 48px (`bar.thickness`), bar content scaled to match.
+  left bar at 48px (`bar.height` on 2.3+, `bar.thickness` on 2.2.x), with
+  content scaled to match.
 - **Shell code** (re-applied as patches, so upstream refactors fail loudly
-  instead of silently reverting): bar thickness support, side weather /
-  timedate scaling.
-- **Login + boot**: `sidonia-no-kishi` SDDM theme (set as current) and GRUB
-  theme, system-wide dark mode, telemetry off, extra packages
-  (`gsettings-desktop-schemas`, `overskride-bin` when an AUR helper exists).
+  instead of silently reverting): square battery pill, and matugen no longer
+  overwriting a hand-managed fastfetch config.
+- **Login + boot**: `sidonia-no-kishi` SDDM theme (set as current), optional
+  GRUB theme (`--no-grub` for Limine/systemd-boot), system-wide dark mode,
+  telemetry off, extra packages (`gsettings-desktop-schemas`,
+  `overskride-bin` when an AUR helper exists).
 
 ## How updates survive
 
@@ -75,11 +85,16 @@ re-overlays everything in the same terminal (sudo can still prompt):
 - User settings are merged with snapshot semantics: keys you never touched
   follow the plugin defaults, keys you edited yourself are never overwritten.
 - The SDDM login theme is re-asserted (stock updates reset it to
-  `material-you`); GRUB/darkmode/config persist on their own.
+  `material-you`); GRUB (if enabled), darkmode, and config persist on their
+  own.
+- A login-time systemd user unit (`shidonia-plugin.service`) watches the shell
+  version. If an update lands outside the Settings button, or the running
+  shell predates the chain, it re-applies the file-level customizations on the
+  next login.
 
 If a patch ever stops applying (upstream refactored those files), apply
-aborts that patch with an error and everything else still runs — update the
-patch in `plugin/patches/` and re-run.
+reports the failure, still refreshes the update chain and settings, and exits
+nonzero — update the patch in `plugin/patches/` and re-run.
 
 Re-running `bash install.sh` (or `apply.sh --post-update`) at any time is
 safe and converges to the same state.

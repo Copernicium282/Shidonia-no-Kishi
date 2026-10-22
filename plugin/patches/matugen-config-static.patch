@@ -1,0 +1,13 @@
+--- a/src/assets/matugen/config-static.toml
++++ b/src/assets/matugen/config-static.toml
+@@ -9,6 +9,7 @@
+ input_path = "templates/cava-colors.ini.template"
+ output_path = "~/.config/cava/config"
+ 
+-[templates.fastfetch]
+-input_path = "templates/fastfetch.jsonc.template"
+-output_path = "~/.config/fastfetch/config.jsonc"
++# fastfetch disabled by user (mcget icons own this file):
++# [templates.fastfetch]
++# input_path = "templates/fastfetch.jsonc.template"
++# output_path = "~/.config/fastfetch/config.jsonc"

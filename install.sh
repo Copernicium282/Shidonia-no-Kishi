@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 # Shidonia-no-Kishi plugin installer - the single entry point.
 #
-#   bash install.sh [--no-system] [--post-update]
+#   bash install.sh [--no-system] [--post-update] [--grub|--no-grub]
+#
+#   --no-grub skips the bundled GRUB theme (for Limine, systemd-boot, or any
+#   other bootloader). The choice is remembered for future updates.
 #
 # Or straight from the internet (no clone needed):
 #   bash -c 'eval "$(curl -fsSL https://raw.githubusercontent.com/Copernicium282/Shidonia-no-Kishi/master/install.sh)"'
@@ -50,4 +53,37 @@ cp -a "$SRC_DIR/plugin/." "$PLUGIN_HOME/plugin/"
 chmod +x "$PLUGIN_HOME/plugin/apply.sh"
 
 echo -e "\e[32m[  OK  ]\e[0m plugin staged at $PLUGIN_HOME"
+
+# Login-time safety net: if an update lands without the Settings chain firing
+# (terminal update, or a running shell whose AboutTab predates the chain),
+# re-apply the file-level customizations on the next login. System steps stay
+# out of this path because they need sudo.
+install_autoheal_unit() {
+    command -v systemctl >/dev/null 2>&1 || return 0
+    local real_home
+    real_home=$(getent passwd "$(id -u)" 2>/dev/null | cut -d: -f6)
+    if [ -n "$real_home" ] && [ "$HOME" != "$real_home" ]; then
+        return 0
+    fi
+    local unit_dir="$HOME/.config/systemd/user"
+    local unit="$unit_dir/shidonia-plugin.service"
+    mkdir -p "$unit_dir"
+    cat > "$unit" <<EOF
+[Unit]
+Description=Re-apply Shidonia customizations after a Serpantinum update
+
+[Service]
+Type=oneshot
+ExecStart="$PLUGIN_HOME/plugin/apply.sh" --if-changed
+
+[Install]
+WantedBy=default.target
+EOF
+    systemctl --user daemon-reload >/dev/null 2>&1 || true
+    if ! systemctl --user enable shidonia-plugin.service >/dev/null 2>&1; then
+        echo -e "\e[33m[ WARN ]\e[0m could not enable the login-time autoheal unit"
+    fi
+}
+install_autoheal_unit
+
 exec bash "$PLUGIN_HOME/plugin/apply.sh" "$@"

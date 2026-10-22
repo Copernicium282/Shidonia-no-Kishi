@@ -2,7 +2,8 @@
   "bar": {
     "position": "left",
     "opacity": 82,
-    "thickness": 48
+    "thickness": 48,
+    "height": 48
   },
   "theme": {
     "fontFamily": "JetBrains Mono",

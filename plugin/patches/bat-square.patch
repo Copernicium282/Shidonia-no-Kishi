@@ -1,0 +1,11 @@
+--- a/src/quickshell/bar/faces/bat/BatFace.qml
++++ b/src/quickshell/bar/faces/bat/BatFace.qml
+@@ -513,7 +513,7 @@
+             Rectangle {
+                 id: batBtn
+                 width: s(root.isCompact ? (root.isDesktop ? 28 : 26) : (root.isDesktop ? 30 : 28))
+-                height: root.isDesktop ? width : s(root.isCompact ? 36 : 40)
++                height: width
+                 Behavior on width { NumberAnimation { duration: 480; easing.type: Easing.OutQuint } }
+                 Behavior on height { NumberAnimation { duration: 480; easing.type: Easing.OutQuint } }
+ 

@@ -44,9 +44,9 @@ def main():
     old = 'install.sh)\\"\''
     new = 'install.sh)\\"; trap \\"\\" HUP; bash ' + chain_target + ' --post-update\''
     count = text.count(old)
-    if count != 2:
+    if count < 1:
         print(
-            f"abouttab: ERROR: expected 2 update-command spots, found {count}. "
+            "abouttab: ERROR: no update-command spots found. "
             "Upstream changed AboutTab.qml beyond recognition; refusing to patch.",
             file=sys.stderr,
         )
@@ -54,16 +54,23 @@ def main():
 
     text = text.replace(old, new)
 
-    # tag the `let cmd` line so future runs (and users) can see the hook
+    # Tag the `let cmd` line so future runs (and users) can see the hook.
+    # If upstream restructures that line, leave a standalone marker so the
+    # idempotence check at the top still works.
+    marked = False
     lines = text.split("\n")
     for i, line in enumerate(lines):
         if "let cmd = " in line and "kitty" in line:
             lines[i] = line.rstrip() + f" // {MARKER}"
+            marked = True
     text = "\n".join(lines)
+    if not marked:
+        text = text.rstrip() + f"\n// {MARKER}\n"
 
     with open(qml_path, "w") as f:
         f.write(text)
-    print("abouttab: update command now re-applies Shidonia customizations post-update")
+    print(f"abouttab: chained {count} update command(s) into Shidonia customizations")
+    return 0
 
 
 if __name__ == "__main__":

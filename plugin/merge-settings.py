@@ -58,6 +58,15 @@ def main():
     if not isinstance(user, dict):
         user = {}
 
+    # Upstream 2.3.0 renamed bar.thickness to bar.height. Carry an existing
+    # user value across before overlay defaults are considered, so a
+    # customized thickness is not replaced by the plugin default.
+    bar = user.get("bar")
+    if isinstance(bar, dict) and "height" not in bar:
+        legacy = bar.get("thickness")
+        if isinstance(legacy, (int, float)) and not isinstance(legacy, bool):
+            bar["height"] = legacy
+
     with open(overlay_path) as f:
         overlay = json.load(f)
     leaves = flatten(overlay)

@@ -1,0 +1,16 @@
+--- a/src/assets/matugen/config.toml
++++ b/src/assets/matugen/config.toml
+@@ -5,9 +5,10 @@
+ input_path = "templates/serpantinum_matugen_colors.json.template"
+ output_path = "~/.local/state/serpantinum/qs_colors.json"
+ 
+-[templates.fastfetch]
+-input_path = "templates/fastfetch.jsonc.template"
+-output_path = "~/.config/fastfetch/config.jsonc"
++# fastfetch disabled by user (mcget icons own this file):
++# [templates.fastfetch]
++# input_path = "templates/fastfetch.jsonc.template"
++# output_path = "~/.config/fastfetch/config.jsonc"
+ 
+ [templates.kitty]
+ input_path = "templates/kitty-colors.conf.template"
